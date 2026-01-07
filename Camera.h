@@ -9,17 +9,19 @@ public:
     glm::vec3 up;
 
     Camera() {
-        position = glm::vec3(0.0f, 0.0f, 5.0f); // Back 5 units
-        target = glm::vec3(0.0f, 0.0f, 0.0f);   // Looking at origin
-        up = glm::vec3(0.0f, 1.0f, 0.0f);       // Y is up
+        position = glm::vec3(0.0f, 2.0f, 10.0f); // High and back
+        target = glm::vec3(0.0f, 0.0f, 0.0f);
+        up = glm::vec3(0.0f, 1.0f, 0.0f);
     }
 
-    // Returns the View Matrix 
     glm::mat4 GetViewMatrix() {
-        return glm::lookAt(position, target, up);
+        // We look from 'position' to 'position + forward' 
+        // But for simple orbital camera, looking at 0,0,0 is fine.
+        // For First Person (WASD), we need a 'front' vector.
+        // Here is a simple implementation:
+        return glm::lookAt(position, position + glm::vec3(0, 0, -1), up);
     }
 
-    
     void MoveForward(float speed) { position.z -= speed; }
     void MoveBackward(float speed) { position.z += speed; }
     void StrafeRight(float speed) { position.x += speed; }

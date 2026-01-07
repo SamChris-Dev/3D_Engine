@@ -1,14 +1,8 @@
 #include "Engine.h"
 
-
 int main(int argc, char** argv) {
-    Engine gameEngine;
-
-    
-    gameEngine.Init(argc, argv, 800, 600, "OpenGL Engine");
-
-   
-    gameEngine.Run();
-
+    Engine game;
+    game.Init(argc, argv, 800, 600, "Labs 07-09 Complete");
+    game.Run();
     return 0;
 }

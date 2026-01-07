@@ -1,41 +1,31 @@
 #pragma once
+#include<Windows.h>
 #include <GL/freeglut.h>
 #include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
 #include <iostream>
-#include "Cube.h"
 #include "Camera.h"
+#include "PrimitiveObject.h"
+#include "Cube.h"
+#include "LetterE.h" // Changing from M to E as requested
 
-enum class ProjectionType {
-    ORTHOGRAPHIC,
-    PERSPECTIVE
-};
+enum class ProjectionType { ORTHOGRAPHIC, PERSPECTIVE };
 
 class Engine {
-    // Members
-	//Cube myCube;
-    Camera mainCamera;
-    CubeObject myCube;
-    CubeObject myPlanet;
-
 private:
-    // Window settings
-    int windowWidth;
-    int windowHeight;
-    int windowHandle;
-
-    // State
+    int windowWidth, windowHeight;
     ProjectionType currentProjection;
     float fov;
 
-	// for static callbacks
     static Engine* instance;
 
-    
-    void InitGLUT(int argc, char** argv);
-    void UpdateProjection();
+    // Lab 09: Camera and Objects
+    Camera mainCamera;
+    PrimitiveObject myAxis;   // Lab 08 Task 1
+    CubeObject myCube;        // Lab 08 Task 2 + Lab 09 Task 3
+    CubeObject myPlanet;      // Lab 09 Task 2 (Hierarchy example)
+    LetterE myLetter;         // Lab 08 Task 3 (Complex Object)
 
-    // Static Callbacks 
+    // Callbacks
     static void DisplayCallback();
     static void ReshapeCallback(int w, int h);
     static void KeyboardCallback(unsigned char key, int x, int y);
@@ -43,18 +33,11 @@ private:
 
 public:
     Engine();
-    ~Engine();
-
-    // Initialization and Graphics Mode 
     void Init(int argc, char** argv, int width, int height, const char* title);
-
-    //  Main game loop start 
     void Run();
-
-    //  Support for changing active projection 
     void SetProjection(ProjectionType type);
 
-    //  logic 
+    // Instance Methods
     void OnRender();
     void OnResize(int w, int h);
     void OnInput(unsigned char key, int x, int y);
