@@ -6,7 +6,7 @@
 #include "Camera.h"
 #include "PrimitiveObject.h"
 #include "Cube.h"
-#include "LetterE.h" // Changing from M to E as requested
+#include "LetterE.h" 
 
 enum class ProjectionType { ORTHOGRAPHIC, PERSPECTIVE };
 
@@ -18,12 +18,12 @@ private:
 
     static Engine* instance;
 
-    // Lab 09: Camera and Objects
+    //  Camera and Objects
     Camera mainCamera;
-    PrimitiveObject myAxis;   // Lab 08 Task 1
-    CubeObject myCube;        // Lab 08 Task 2 + Lab 09 Task 3
-    CubeObject myPlanet;      // Lab 09 Task 2 (Hierarchy example)
-    LetterE myLetter;         // Lab 08 Task 3 (Complex Object)
+    PrimitiveObject myAxis;   
+    CubeObject myCube;        
+    CubeObject myPlanet;      
+    LetterE myLetter;         
 
     // Callbacks
     static void DisplayCallback();

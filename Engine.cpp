@@ -24,7 +24,7 @@ void Engine::Init(int argc, char** argv, int width, int height, const char* titl
 
     glEnable(GL_DEPTH_TEST);
 
-    // --- Lab 09 Initialization ---
+   
     // Position objects
     myCube.position = glm::vec3(-3.0f, 0.0f, 0.0f);
 
@@ -36,16 +36,16 @@ void Engine::Run() { glutMainLoop(); }
 
 void Engine::SetProjection(ProjectionType type) {
     currentProjection = type;
-    OnResize(windowWidth, windowHeight); // Force update
+    OnResize(windowWidth, windowHeight); 
 }
 
-// --- Callbacks ---
+//  Callbacks 
 void Engine::DisplayCallback() { if (instance) instance->OnRender(); }
 void Engine::ReshapeCallback(int w, int h) { if (instance) instance->OnResize(w, h); }
 void Engine::KeyboardCallback(unsigned char k, int x, int y) { if (instance) instance->OnInput(k, x, y); }
 void Engine::TimerCallback(int v) { if (instance) { instance->OnUpdate(); glutTimerFunc(16, TimerCallback, 0); } }
 
-// --- Logic ---
+//  Logic 
 void Engine::OnResize(int w, int h) {
     windowWidth = w; windowHeight = h;
     glViewport(0, 0, w, h);
@@ -66,17 +66,17 @@ void Engine::OnResize(int w, int h) {
 void Engine::OnInput(unsigned char key, int x, int y) {
     float speed = 0.5f;
 
-    // Lab 09 Task 4: Camera Controls (WASD)
+    // Camera Controls (WASD)
     if (key == 'w') mainCamera.MoveForward(speed);
     if (key == 's') mainCamera.MoveBackward(speed);
     if (key == 'a') mainCamera.StrafeLeft(speed);
     if (key == 'd') mainCamera.StrafeRight(speed);
 
-    // Lab 09 Task 3: Object Transformation Control
+    // Object Transformation Control
     if (key == 'q') myCube.rotation.y += 5.0f;
     if (key == 'e') myCube.rotation.y -= 5.0f;
 
-    // Toggle Projections (Lab 07)
+    // Toggle Projections
     if (key == 'p') SetProjection(ProjectionType::PERSPECTIVE);
     if (key == 'o') SetProjection(ProjectionType::ORTHOGRAPHIC);
 
@@ -91,36 +91,45 @@ void Engine::OnRender() {
     glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    // Lab 09: Get View Matrix from Camera
-    glm::mat4 view = mainCamera.GetViewMatrix();
+    // Get View Matrix from Camera 
+        glm::mat4 view = mainCamera.GetViewMatrix();
 
-    // --- Draw Scene ---
+    //  1. Primitive Axis 
 
-    // 1. Primitive Axis (Lab 08 Task 1)
-    // We pass 'view' so it stays fixed in world space
     glMatrixMode(GL_MODELVIEW);
     glLoadMatrixf(glm::value_ptr(view));
     myAxis.Draw();
 
-    // 2. Spinning Cube (Lab 08 Task 2 + Lab 09 Task 3)
+    //  2. Spinning Cube 
+    // Center object
     myCube.rotation.x += 0.5f; // Constant spin
+    myCube.rotation.y += 0.5f;
     myCube.Draw(view);
 
-    // 3. Orbiting Planet (Lab 09 Example 3)
-    static float angle = 0.0f;
-    angle += 1.0f;
-    myPlanet.position.x = 3.0f * cos(glm::radians(angle));
-    myPlanet.position.z = 3.0f * sin(glm::radians(angle));
+    //  3. Orbiting Planet 
+    // Orbiting sphere on the right 
+        static float angle = 0.0f;
+    angle += 0.02f; // Slower orbit speed
+    myPlanet.position.x = 6.0f * cos(angle);
+    myPlanet.position.z = 3.0f * sin(angle);
     myPlanet.Draw(view);
 
-    // 4. Letter E (Lab 08 Task 3)
-    // Note: LetterE is a composite, it doesn't inherit GameObject, 
-    // so we manually position it using the Stack
+    //  4. Letter E 
+    
     glMatrixMode(GL_MODELVIEW);
     glLoadMatrixf(glm::value_ptr(view));
     glPushMatrix();
-    glTranslatef(0.0f, 3.0f, 0.0f); // Draw 'E' floating above origin
+    glTranslatef(2.0f, 3.0f, 0.0f);
     myLetter.Draw();
+    glPopMatrix();
+
+    //  5. The Teapot 
+   
+    glPushMatrix();
+    glTranslatef(-8.0f, 0.0f, 0.0f); 
+    glRotatef(angle * 50.0f, 0.0f, 1.0f, 0.0f); 
+    glColor3f(1.0f, 1.0f, 0.0f);     // Yellow color
+    glutWireTeapot(1.0);             
     glPopMatrix();
 
     glutSwapBuffers();

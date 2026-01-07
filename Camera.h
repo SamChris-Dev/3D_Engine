@@ -15,10 +15,7 @@ public:
     }
 
     glm::mat4 GetViewMatrix() {
-        // We look from 'position' to 'position + forward' 
-        // But for simple orbital camera, looking at 0,0,0 is fine.
-        // For First Person (WASD), we need a 'front' vector.
-        // Here is a simple implementation:
+       
         return glm::lookAt(position, position + glm::vec3(0, 0, -1), up);
     }
 

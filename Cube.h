@@ -6,7 +6,7 @@
 class CubeObject : public GameObject, public Mesh {
 public:
     CubeObject() : Mesh(GL_TRIANGLES) {
-        // --- Raw Data ---
+        // Raw Data 
         std::vector<float> v = {
             -1,-1, 1,  1,-1, 1,  1, 1, 1, -1, 1, 1, // Front
             -1,-1,-1, -1, 1,-1,  1, 1,-1,  1,-1,-1, // Back
