@@ -1,4 +1,6 @@
 #include "Engine.h"
+#include "BitmapHandler.h"
+#include "TexturedCube.h"
 #include <glm/gtc/type_ptr.hpp>
 
 Engine* Engine::instance = nullptr;
@@ -25,12 +27,58 @@ void Engine::Init(int argc, char** argv, int width, int height, const char* titl
     glEnable(GL_DEPTH_TEST);
 
    
+    //  Lighting Setup
+    SetupLighting();
+
+
+    GLuint texID = BitmapHandler::LoadTexture("brickjpg.jpg");
+
+
     // Position objects
     myCube.position = glm::vec3(-3.0f, 0.0f, 0.0f);
 
     myPlanet.position = glm::vec3(3.0f, 0.0f, 0.0f);
-    myPlanet.scale = glm::vec3(0.5f); // Smaller planet
+    myPlanet.scale = glm::vec3(0.5f);
+
+    // Setup Textured Cube
+    myTextureCube.SetTexture(texID);
+    myTextureCube.position = glm::vec3(-7.0f, 3.0f, -4.0f); 
+
 }
+
+
+
+//  Implement Phong Lighting Model  
+void Engine::SetupLighting() {
+    //  Enable Lighting
+    glEnable(GL_LIGHTING);
+    glEnable(GL_LIGHT0);       // Turn on the first light "bulb"
+    glEnable(GL_NORMALIZE);    
+
+    //  Enable Color Tracking
+    glEnable(GL_COLOR_MATERIAL);
+    glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE);
+
+    //  Set Light 0 Properties (The "Sun")
+    GLfloat ambient[] = { 0.2f, 0.2f, 0.2f, 1.0f }; // Soft background light
+    GLfloat diffuse[] = { 0.8f, 0.8f, 0.8f, 1.0f }; // Main directional brightness
+    GLfloat specular[] = { 1.0f, 1.0f, 1.0f, 1.0f }; // Shiny highlights
+    GLfloat position[] = { 0.0f, 5.0f, 5.0f, 1.0f }; // Positioned up and front
+
+    glLightfv(GL_LIGHT0, GL_AMBIENT, ambient);
+    glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuse);
+    glLightfv(GL_LIGHT0, GL_SPECULAR, specular);
+    glLightfv(GL_LIGHT0, GL_POSITION, position);
+
+    //  Set Global Model
+    GLfloat globalAmbient[] = { 0.1f, 0.1f, 0.1f, 1.0f };
+    glLightModelfv(GL_LIGHT_MODEL_AMBIENT, globalAmbient);
+
+    //  Default Shading
+    glShadeModel(GL_SMOOTH); // Gouraud Shading 
+}
+
+
 
 void Engine::Run() { glutMainLoop(); }
 
@@ -80,6 +128,21 @@ void Engine::OnInput(unsigned char key, int x, int y) {
     if (key == 'p') SetProjection(ProjectionType::PERSPECTIVE);
     if (key == 'o') SetProjection(ProjectionType::ORTHOGRAPHIC);
 
+    //  Toggle Shading/Lighting 
+    if (key == 'l') {
+        isLightingEnabled = !isLightingEnabled;
+        if (isLightingEnabled) glEnable(GL_LIGHTING);
+        else glDisable(GL_LIGHTING);
+        std::cout << "Lighting: " << (isLightingEnabled ? "ON" : "OFF") << std::endl;
+    }
+    if (key == 'k') {
+        isSmoothShading = !isSmoothShading;
+        if (isSmoothShading) glShadeModel(GL_SMOOTH);
+        else glShadeModel(GL_FLAT); 
+        std::cout << "Shading: " << (isSmoothShading ? "SMOOTH" : "FLAT") << std::endl;
+    }
+
+
     if (key == 27) glutLeaveMainLoop();
 }
 
@@ -88,49 +151,69 @@ void Engine::OnUpdate() {
 }
 
 void Engine::OnRender() {
-    glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
+    glClearColor(0.1f, 0.1f, 0.1f, 1.0f); // Darker background to see lights better
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     // Get View Matrix from Camera 
         glm::mat4 view = mainCamera.GetViewMatrix();
 
-    //  1. Primitive Axis 
 
+
+
+
+
+    //   Primitive Axis 
+    glDisable(GL_LIGHTING);
     glMatrixMode(GL_MODELVIEW);
     glLoadMatrixf(glm::value_ptr(view));
     myAxis.Draw();
 
-    //  2. Spinning Cube 
-    // Center object
+    // Re-enable lighting for 3D objects
+    if (isLightingEnabled) glEnable(GL_LIGHTING);
+
+    //   Spinning Cube 
+    GLfloat mat_specular[] = { 1.0, 1.0, 1.0, 1.0 };
+    GLfloat mat_shininess[] = { 50.0 }; 
+    glMaterialfv(GL_FRONT, GL_SPECULAR, mat_specular);
+    glMaterialfv(GL_FRONT, GL_SHININESS, mat_shininess);
     myCube.rotation.x += 0.5f; // Constant spin
     myCube.rotation.y += 0.5f;
     myCube.Draw(view);
 
-    //  3. Orbiting Planet 
-    // Orbiting sphere on the right 
-        static float angle = 0.0f;
+    //   Orbiting Planet 
+    static float angle = 0.0f;
     angle += 0.02f; // Slower orbit speed
     myPlanet.position.x = 6.0f * cos(angle);
     myPlanet.position.z = 3.0f * sin(angle);
     myPlanet.Draw(view);
 
-    //  4. Letter E 
-    
+    //   Letter E 
     glMatrixMode(GL_MODELVIEW);
     glLoadMatrixf(glm::value_ptr(view));
     glPushMatrix();
-    glTranslatef(2.0f, 3.0f, 0.0f);
+    glTranslatef(6.0f, 4.0f, -4.0f);
     myLetter.Draw();
     glPopMatrix();
 
-    //  5. The Teapot 
-   
+    //   The Teapot 
     glPushMatrix();
     glTranslatef(-8.0f, 0.0f, 0.0f); 
     glRotatef(angle * 50.0f, 0.0f, 1.0f, 0.0f); 
-    glColor3f(1.0f, 1.0f, 0.0f);     // Yellow color
+
+    if (isLightingEnabled)
+        glutSolidTeapot(1.0);
+    else
+        glutWireTeapot(1.0);
+
     glutWireTeapot(1.0);             
     glPopMatrix();
+
+
+
+    //  Textured Cube 
+    myTextureCube.rotation.y += 1.0f;
+    myTextureCube.Draw(view);
+
 
     glutSwapBuffers();
 }

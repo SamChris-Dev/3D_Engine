@@ -143,6 +143,9 @@
     <ClCompile Include="Main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="BitmapHandler.h">
+      <DeploymentContent>false</DeploymentContent>
+    </ClInclude>
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Cube.h" />
     <ClInclude Include="Engine.h" />
@@ -150,6 +153,14 @@
     <ClInclude Include="letterE.h" />
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="PrimitiveObject.h" />
+    <ClInclude Include="stb_image.h" />
+    <ClInclude Include="TexturedCube.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="brickjpg.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="freeglut.dll" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

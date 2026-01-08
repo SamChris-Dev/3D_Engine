@@ -1,5 +1,5 @@
 #pragma once
-#include "Cube.h" // Reuses Cube for parts
+#include "Cube.h" 
 
 class LetterE {
 private:

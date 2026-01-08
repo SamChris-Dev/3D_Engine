@@ -7,6 +7,7 @@
 #include "PrimitiveObject.h"
 #include "Cube.h"
 #include "LetterE.h" 
+#include "TexturedCube.h"
 
 enum class ProjectionType { ORTHOGRAPHIC, PERSPECTIVE };
 
@@ -23,7 +24,12 @@ private:
     PrimitiveObject myAxis;   
     CubeObject myCube;        
     CubeObject myPlanet;      
-    LetterE myLetter;         
+    LetterE myLetter;
+    TexturedCube myTextureCube;
+
+    //  Lighting State 
+    bool isLightingEnabled;
+    bool isSmoothShading;
 
     // Callbacks
     static void DisplayCallback();
@@ -42,4 +48,8 @@ public:
     void OnResize(int w, int h);
     void OnInput(unsigned char key, int x, int y);
     void OnUpdate();
+
+
+	// Helper lighting setup
+    void SetupLighting();
 };
